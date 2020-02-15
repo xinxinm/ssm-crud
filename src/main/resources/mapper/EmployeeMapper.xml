@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crud.dao.EmployeeMapper">
+   
+   <resultMap type="com.crud.bean.Employee" id="empWithDeptResultMap">
+   	<id column="emp_id" property="empId"/>
+    <result column="emp_name" property="empName"/>
+    <result column="gender" property="gender"/>
+    <result column="email" property="email"/>
+    <result column="d_id" property="dId"/>
+    
+    <association property="department" javaType="com.crud.bean.Department">
+	    <id column="dept_id" property="deptId"/>
+	    <result column="dept_name" property="deptName"/>
+    </association>
+   </resultMap>
+   
+   <select id="findEmpWithDept"  resultMap="empWithDeptResultMap">
+	SELECT 
+	emp_id,emp_name,gender,email,d_id,dept_name
+	FROM emp
+	LEFT JOIN dept ON emp.`d_id` = dept.`dept_id`
+   </select>
+   
+   <insert id="updateEmpData" parameterType="com.crud.bean.Employee">
+   		INSERT INTO emp
+ 		VALUES(#{empId},#{empName},#{gender},#{email},#{dId})
+   </insert>
+   
+   <insert id="saveDepartmentInfo" parameterType="com.crud.bean.Employee">
+  		INSERT INTO emp(emp_name,gender,email,d_id)
+		VALUES(#{empName},#{gender},#{email},#{dId});
+  </insert>
+  
+  <select id="findEmpNameIsRepeat" parameterType="java.lang.String" resultType="com.crud.bean.Employee">
+  		 SELECT * FROM emp WHERE emp_name= #{empName};
+  </select>
+  
+  <select id="findEmpById" parameterType="java.lang.Integer" resultType="com.crud.bean.Employee">
+  		SELECT * FROM emp WHERE emp_id= #{empId};
+  </select>
+  
+  <update id="updateInfoById" parameterType="com.crud.bean.Employee">
+  		UPDATE emp set email=#{email},gender=#{gender},d_id=#{dId} WHERE emp_id=#{empId}
+  </update>
+  
+  <delete id="deleteById" parameterType="java.lang.Integer">
+		DELETE FROM emp  WHERE emp_id=#{empId}  
+  </delete>
+  
+  
+  <delete id="deleteIds" parameterType="java.util.List">
+  	DELETE FROM emp WHERE emp_id IN
+  		<foreach collection="list"  item="empId" open="(" close=")" separator=",">
+  			#{empId}
+  		</foreach>
+  </delete>
+</mapper>
